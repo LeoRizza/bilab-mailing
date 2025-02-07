@@ -1,13 +1,13 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-export default async function handler(req, res) {
-    // ✅ Configuración de CORS - Asegura que se envíen siempre
+module.exports = async function handler(req, res) {
+    // Permitir CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // ✅ Manejo de preflight request
+    // Manejo de preflight request (CORS)
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
@@ -47,4 +47,4 @@ export default async function handler(req, res) {
         console.error("Error al enviar el correo:", error);
         res.status(500).json({ message: "Error al enviar el correo" });
     }
-}
+};
