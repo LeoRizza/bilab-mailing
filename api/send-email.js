@@ -1,7 +1,17 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
+    // 🔹 Habilitar CORS
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    // 🔹 Manejar preflight request
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Método no permitido" });
     }
@@ -9,7 +19,7 @@ module.exports = async function handler(req, res) {
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
     try {
-        // Configurar el transporte de Nodemailer
+        // 🔹 Configurar transporte de Nodemailer
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -18,7 +28,7 @@ module.exports = async function handler(req, res) {
             },
         });
 
-        // Configurar el correo
+        // 🔹 Configurar contenido del email
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: "info@wearebilab.com",
@@ -33,11 +43,11 @@ module.exports = async function handler(req, res) {
             `,
         };
 
-        // Enviar el correo
+        // 🔹 Enviar el correo
         await transporter.sendMail(mailOptions);
         res.status(200).json({ message: "Correo enviado con éxito" });
     } catch (error) {
         console.error("Error al enviar el correo:", error);
         res.status(500).json({ message: "Error al enviar el correo" });
     }
-};
+}
