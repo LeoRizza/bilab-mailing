@@ -1,20 +1,24 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-module.exports = async function handler(req, res) {
-    // Permitir CORS
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
+export default async function handler(req, res) {
     // Manejo de preflight request (CORS)
     if (req.method === "OPTIONS") {
+        res.setHeader("Access-Control-Allow-Origin", "*"); 
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
         return res.status(200).end();
     }
 
+    // Validación de método
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Método no permitido" });
     }
+
+    // Permitir CORS en todas las respuestas
+    res.setHeader("Access-Control-Allow-Origin", "*"); 
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
@@ -47,4 +51,4 @@ module.exports = async function handler(req, res) {
         console.error("Error al enviar el correo:", error);
         res.status(500).json({ message: "Error al enviar el correo" });
     }
-};
+}
