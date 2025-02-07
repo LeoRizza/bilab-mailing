@@ -1,28 +1,21 @@
 require("dotenv").config();
-const express = require("express");
 const nodemailer = require("nodemailer");
-const cors = require("cors");
-const bodyParser = require("body-parser");
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ message: "Método no permitido" });
+    }
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-
-// 📩 Ruta para manejar el envío del formulario
-app.post("/send-email", async (req, res) => {
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
     try {
         // Configurar el transporte de Nodemailer
         const transporter = nodemailer.createTransport({
-            service: "gmail",  // Puedes cambiarlo según el proveedor
+            service: "gmail", // O usa otro proveedor
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
+                pass: process.env.EMAIL_PASS,
+            },
         });
 
         // Configurar el correo
@@ -37,7 +30,7 @@ app.post("/send-email", async (req, res) => {
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Teléfono:</strong> ${telefono}</p>
                 <p><strong>Mensaje:</strong> ${mensaje}</p>
-            `
+            `,
         };
 
         // Enviar el correo
@@ -47,9 +40,4 @@ app.post("/send-email", async (req, res) => {
         console.error("Error al enviar el correo:", error);
         res.status(500).json({ message: "Error al enviar el correo" });
     }
-});
-
-// Iniciar el servidor
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+}
