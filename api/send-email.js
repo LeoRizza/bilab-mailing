@@ -2,12 +2,11 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 export default async function handler(req, res) {
-    // 🔹 Habilitar CORS
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    // ✅ Configuración de CORS
+    res.setHeader("Access-Control-Allow-Origin", "https://gray-pony-576316.hostingersite.com"); // Reemplaza con tu dominio exacto
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // 🔹 Manejar preflight request
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
@@ -19,7 +18,6 @@ export default async function handler(req, res) {
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
     try {
-        // 🔹 Configurar transporte de Nodemailer
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -28,7 +26,6 @@ export default async function handler(req, res) {
             },
         });
 
-        // 🔹 Configurar contenido del email
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: "info@wearebilab.com",
@@ -43,7 +40,6 @@ export default async function handler(req, res) {
             `,
         };
 
-        // 🔹 Enviar el correo
         await transporter.sendMail(mailOptions);
         res.status(200).json({ message: "Correo enviado con éxito" });
     } catch (error) {
