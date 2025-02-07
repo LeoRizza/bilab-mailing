@@ -2,11 +2,12 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 export default async function handler(req, res) {
-    // ✅ Configuración de CORS
-    res.setHeader("Access-Control-Allow-Origin", "https://gray-pony-576316.hostingersite.com"); // Reemplaza con tu dominio exacto
+    // ✅ Configuración de CORS - Asegura que se envíen siempre
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+    // ✅ Manejo de preflight request
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
