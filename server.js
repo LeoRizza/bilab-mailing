@@ -1,5 +1,4 @@
-require("dotenv").config();
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
@@ -8,19 +7,25 @@ export default async function handler(req, res) {
 
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
+    if (!nombre || !empresa || !email || !mensaje) {
+        return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
     try {
-        // Configurar el transporte de Nodemailer
+        // 🚀 Configuración de transporte SMTP (MEJOR QUE "gmail")
         const transporter = nodemailer.createTransport({
-            service: "gmail", // O usa otro proveedor
+            host: "smtp.gmail.com", // Usa SMTP de Gmail
+            port: 465, // Puerto seguro para SMTP
+            secure: true, // true para SSL
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
         });
 
-        // Configurar el correo
+        // ✉️ Configuración del correo
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"Contacto BiLab" <${process.env.EMAIL_USER}>`,
             to: "info@wearebilab.com",
             subject: "Nuevo mensaje de contacto",
             html: `
@@ -33,11 +38,12 @@ export default async function handler(req, res) {
             `,
         };
 
-        // Enviar el correo
+        // 📩 Enviar el correo
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "Correo enviado con éxito" });
+        return res.status(200).json({ message: "Correo enviado con éxito" });
+
     } catch (error) {
         console.error("Error al enviar el correo:", error);
-        res.status(500).json({ message: "Error al enviar el correo" });
+        return res.status(500).json({ message: "Error al enviar el correo", error: error.message });
     }
 }
