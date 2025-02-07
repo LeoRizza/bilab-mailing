@@ -1,31 +1,26 @@
-import nodemailer from "nodemailer";
+require("dotenv").config();
+const nodemailer = require("nodemailer");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Método no permitido" });
     }
 
     const { nombre, empresa, email, telefono, mensaje } = req.body;
 
-    if (!nombre || !empresa || !email || !mensaje) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios" });
-    }
-
     try {
-        // 🚀 Configuración de transporte SMTP (MEJOR QUE "gmail")
+        // Configurar el transporte de Nodemailer
         const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com", // Usa SMTP de Gmail
-            port: 465, // Puerto seguro para SMTP
-            secure: true, // true para SSL
+            service: "gmail",
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
         });
 
-        // ✉️ Configuración del correo
+        // Configurar el correo
         const mailOptions = {
-            from: `"Contacto BiLab" <${process.env.EMAIL_USER}>`,
+            from: process.env.EMAIL_USER,
             to: "info@wearebilab.com",
             subject: "Nuevo mensaje de contacto",
             html: `
@@ -38,12 +33,11 @@ export default async function handler(req, res) {
             `,
         };
 
-        // 📩 Enviar el correo
+        // Enviar el correo
         await transporter.sendMail(mailOptions);
-        return res.status(200).json({ message: "Correo enviado con éxito" });
-
+        res.status(200).json({ message: "Correo enviado con éxito" });
     } catch (error) {
         console.error("Error al enviar el correo:", error);
-        return res.status(500).json({ message: "Error al enviar el correo", error: error.message });
+        res.status(500).json({ message: "Error al enviar el correo" });
     }
-}
+};
